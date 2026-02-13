@@ -54,16 +54,35 @@
  */
 export function createThaliDescription(thali) {
   // Your code here
+  if(typeof thali !== "object" || thali === null || typeof thali.name !== "string" || !Array.isArray(thali.items) || typeof thali.price !== "number" || typeof thali.isVeg !== "boolean") return "";
+  return `${thali.name.toUpperCase()} (${thali.isVeg ? "Veg" : "Non-Veg"}) - Items: ${thali.items.join(", ")} - Rs.${thali.price.toFixed(2)}`;
 }
 
 export function getThaliStats(thalis) {
   // Your code here
+  if(!Array.isArray(thalis) || thalis.length === 0) return null;
+  const vegcnt = thalis.filter(thali => thali.isVeg === true).length;
+  const nonvegcnt = thalis.filter(thali => thali.isVeg === false).length;
+  const total = thalis.reduce((acc, thali) => acc + thali.price, 0);
+  const min = Math.min(...thalis.map(thali => thali.price));
+  const max = Math.max(...thalis.map(thali => thali.price));
+  const arr = thalis.map(thali => thali.name);
+  return { totalThalis: thalis.length, vegCount: vegcnt, nonVegCount: nonvegcnt, avgPrice: (total / thalis.length).toFixed(2), cheapest: min, costliest: max, names: arr};
 }
 
 export function searchThaliMenu(thalis, query) {
   // Your code here
+  if(!Array.isArray(thalis) || typeof query !== "string") return [];
+  const q = query.toLowerCase();
+
+  return thalis.filter(thali => thali.name.toLowerCase().includes(q) || thali.items.some(item => item.toLowerCase().includes(q)));
 }
 
 export function generateThaliReceipt(customerName, thalis) {
   // Your code here
+  if(typeof customerName !== "string" || !Array.isArray(thalis) || thalis.length === 0) return "";
+  const total = thalis.reduce((acc, thali) => acc + thali.price, 0);
+  const count = thalis.length;
+  const lineitem = thalis.map(thali => `- ${thali.name} x Rs.${thali.price}`).join("\n");
+  return `THALI RECEIPT\n---\nCustomer: ${customerName.toUpperCase()}\n${lineitem}\n---\nTotal: Rs.${total}\nItems: ${count}`
 }
